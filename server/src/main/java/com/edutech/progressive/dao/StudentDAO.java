@@ -2,6 +2,7 @@ package com.edutech.progressive.dao;
 import com.edutech.progressive.entity.Student;
 import java.sql.SQLException;
 import java.util.List;
+
 public interface StudentDAO {
     int addStudent(Student student) throws SQLException;
     Student getStudentById(int studentId) throws SQLException;
