@@ -1,5 +1,10 @@
 package com.edutech.progressive.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface StudentRepository {
+import com.edutech.progressive.entity.Student;
+
+public interface StudentRepository extends JpaRepository<Student, Integer> {
+    Student findByStudentId(int studentId);
+    // Future extension (Day-9+): Student findByEmail(String email);
 }
