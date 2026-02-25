@@ -11,34 +11,38 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
  
+
 @Entity
-@Table(name = "student")
+@Table(name = "Student")
 public class Student implements Comparable<Student> {
- 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "student_id")
     private int studentId;
- 
+
     @Column(name = "full_name", nullable = false, length = 255)
     private String fullName;
- 
+
     @Temporal(TemporalType.DATE)
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
- 
+
     @Column(name = "contact_number", length = 15)
     private String contactNumber;
- 
+
     @Column(name = "email", nullable = false, length = 100)
     private String email;
- 
+
     @Column(name = "address", length = 255)
     private String address;
- 
+
+    // Default constructor
     public Student() {}
- 
-    public Student(int studentId, String fullName, Date dateOfBirth, String contactNumber, String email, String address) {
+
+    // Parameterized constructor
+    public Student(int studentId, String fullName, Date dateOfBirth,
+                   String contactNumber, String email, String address) {
         this.studentId = studentId;
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
@@ -46,24 +50,30 @@ public class Student implements Comparable<Student> {
         this.email = email;
         this.address = address;
     }
- 
+
+    // Getters
     public int getStudentId() { return studentId; }
     public String getFullName() { return fullName; }
     public Date getDateOfBirth() { return dateOfBirth; }
     public String getContactNumber() { return contactNumber; }
     public String getEmail() { return email; }
     public String getAddress() { return address; }
+
+    // Setters
     public void setStudentId(int studentId) { this.studentId = studentId; }
     public void setFullName(String fullName) { this.fullName = fullName; }
     public void setDateOfBirth(Date dateOfBirth) { this.dateOfBirth = dateOfBirth; }
     public void setContactNumber(String contactNumber) { this.contactNumber = contactNumber; }
     public void setEmail(String email) { this.email = email; }
     public void setAddress(String address) { this.address = address; }
- 
+
+    // Day-2 asks Comparable by name; including now is safe (no side-effects)
     @Override
-    public int compareTo(Student other) {
-        String a = fullName == null ? "" : fullName;
-        String b = other == null || other.fullName == null ? "" : other.fullName;
-        return a.compareTo(b);
+    public int compareTo(Student otherStudent) {
+        if (otherStudent == null) return 1;
+        if (this.fullName == null && otherStudent.fullName == null) return 0;
+        if (this.fullName == null) return -1;
+        if (otherStudent.fullName == null) return 1;
+        return this.fullName.compareToIgnoreCase(otherStudent.fullName);
     }
 }
