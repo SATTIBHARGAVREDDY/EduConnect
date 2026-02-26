@@ -1,7 +1,6 @@
-package com.edutech.progressive.controller;
  
+package com.edutech.progressive.controller;
 import com.edutech.progressive.entity.Student;
-
 import com.edutech.progressive.service.impl.StudentServiceImplArraylist;
 
 import com.edutech.progressive.service.impl.StudentServiceImplJpa;
@@ -79,7 +78,6 @@ public class StudentController {
         return ResponseEntity.ok().build();
 
     }
- 
     @DeleteMapping("/{studentId}")
 
     public ResponseEntity<Void> deleteStudent(@PathVariable int studentId) {
@@ -123,4 +121,3 @@ public class StudentController {
     }
 
 }
- 
