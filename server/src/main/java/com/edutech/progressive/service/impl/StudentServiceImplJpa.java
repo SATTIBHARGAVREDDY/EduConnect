@@ -1,92 +1,74 @@
 package com.edutech.progressive.service.impl;
-
-import java.util.List;
-
-import javax.transaction.Transactional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.stereotype.Service;
-
+ 
+import com.edutech.progressive.dto.StudentDTO;
 import com.edutech.progressive.entity.Student;
 import com.edutech.progressive.repository.StudentRepository;
-
-import net.bytebuddy.asm.Advice.OffsetMapping.Sort;
-import net.bytebuddy.dynamic.DynamicType.Builder.FieldDefinition.Optional;
-
+import com.edutech.progressive.service.StudentService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+ 
+import java.util.Comparator;
+import java.util.List;
+ 
 @Service
 @Transactional
-public class StudentServiceImplJpa {
-
+public class StudentServiceImplJpa implements StudentService {
+ 
     private final StudentRepository studentRepository;
-
-    @Autowired
+ 
     public StudentServiceImplJpa(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
     }
-
-    public List<Student> getAllStudents() throws Exception {
-        try {
-            return studentRepository.findAll();
-        } catch (DataAccessException ex) {
-            throw new Exception("Failed to fetch students", ex);
-        }
+ 
+    @Override
+    @Transactional(readOnly = true)
+    public List<Student> getAllStudents() {
+        return studentRepository.findAll();
     }
-
-    public Integer addStudent(Student student) throws Exception {
-        try {
-            Student saved = studentRepository.save(student);
-            return saved != null ? saved.getStudentId() : -1;
-        } catch (DataAccessException ex) {
-            throw new Exception("Failed to add student", ex);
-        }
+ 
+    @Override
+    public Integer addStudent(Student student) {
+        Student saved = studentRepository.save(student);
+        return saved.getStudentId();
     }
-
-    public List<Student> getAllStudentSortedByName() throws Exception {
-        try {
-           
-        } catch (DataAccessException ex) {
-            throw new Exception("Failed to fetch students sorted by name", ex);
-        }
-        return null;
+ 
+    @Override
+    @Transactional(readOnly = true)
+    public List<Student> getAllStudentSortedByName() {
+        List<Student> list = studentRepository.findAll();
+        list.sort(Comparator.comparing(
+                s -> s.getFullName() == null ? "" : s.getFullName(),
+                String.CASE_INSENSITIVE_ORDER
+        ));
+        return list;
     }
-
-    public void updateStudent(Student student) throws Exception {
-        try {
-            int id = student.getStudentId();
-            java.util.Optional<Student> existing = studentRepository.findById(id);
-            if (existing.isEmpty()) {
-                throw new Exception("Student not found with id: " + id);
-            }
-            // Make sure the ID remains consistent
-            student.setStudentId(id);
-            studentRepository.save(student);
-        } catch (DataAccessException ex) {
-            throw new Exception("Failed to update student", ex);
+ 
+    @Override
+    public void updateStudent(Student student) {
+        if (student.getStudentId() == 0) {
+            throw new IllegalArgumentException("studentId must be provided for update");
         }
-    }
-
-    public void deleteStudent(int studentId) throws Exception {
-        try {
-            if (!studentRepository.existsById(studentId)) {
-                throw new Exception("Student not found with id: " + studentId);
-            }
-            studentRepository.deleteById(studentId);
-        } catch (DataAccessException ex) {
-            throw new Exception("Failed to delete student", ex);
+        if (!studentRepository.existsById(student.getStudentId())) {
+            throw new IllegalArgumentException("Student not found with id: " + student.getStudentId());
         }
+        studentRepository.save(student);
     }
-
-    public Student getStudentById(int studentId) throws Exception {
-        try {
-            return studentRepository.findById(studentId).orElse(null);
-        } catch (DataAccessException ex) {
-            throw new Exception("Failed to fetch student by id", ex);
+ 
+    @Override
+    public void deleteStudent(int studentId) {
+        if (!studentRepository.existsById(studentId)) {
+            throw new IllegalArgumentException("Student not found with id: " + studentId);
         }
+        studentRepository.deleteById(studentId);
     }
-
-    // Not required on Day-5; kept as a stub for future days
-    public void modifyStudentDetails(/* StudentDTO studentDTO */) {
-        // No-op for Day-5
+ 
+    @Override
+    @Transactional(readOnly = true)
+    public Student getStudentById(int studentId) {
+        return studentRepository.findById(studentId).orElse(null);
+    }
+ 
+    @Override
+    public void modifyStudentDetails(StudentDTO studentDTO) {
     }
 }
